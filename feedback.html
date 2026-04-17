@@ -1,0 +1,95 @@
+<!-- frontend/views/feedback.html -->
+<div>
+  <div class="alert alert-success" ng-if="alertMsg && alertType === 'success'">✅ {{alertMsg}}</div>
+  <div class="alert alert-error" ng-if="alertMsg && alertType === 'error'">❌ {{alertMsg}}</div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>Guest Feedback ({{feedbacks.length}})</h3>
+      <button class="btn btn-primary" ng-click="openAdd()">+ Add Feedback</button>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Guest</th>
+            <th>Hotel</th>
+            <th>Room</th>
+            <th>Rating</th>
+            <th>Comments</th>
+            <th>Submitted</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="f in feedbacks">
+            <td>#{{f.feedback_id}}</td>
+            <td><strong style="color:var(--text-primary)">{{f.guest_name}}</strong></td>
+            <td>{{f.hotel_name}}</td>
+            <td>Room {{f.room_number}}</td>
+            <td>
+              <span class="stars">{{getStars(f.rating)}}</span>
+              <span style="font-size:11px;color:var(--text-muted);margin-left:4px;">({{f.rating}}/5)</span>
+            </td>
+            <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-secondary);">
+              {{f.comments}}
+            </td>
+            <td>{{f.submitted_at | date:'dd MMM yyyy'}}</td>
+            <td>
+              <button class="btn btn-danger btn-sm" ng-click="delete(f.feedback_id)">🗑️</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="empty-state" ng-if="feedbacks.length === 0">
+        <div class="empty-icon">⭐</div>
+        <p>No feedback submitted yet</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" ng-class="{hidden: !showModal}">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Add Guest Feedback</h3>
+        <button class="modal-close" ng-click="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Reservation *</label>
+            <select ng-model="formData.reservation_id" required>
+              <option value="">-- Select Reservation --</option>
+              <option ng-repeat="r in reservations" value="{{r.reservation_id}}">
+                #{{r.reservation_id}} - {{r.guest_name}} ({{r.room_number}})
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Guest *</label>
+            <select ng-model="formData.guest_id" required>
+              <option value="">-- Select Guest --</option>
+              <option ng-repeat="g in guests" value="{{g.guest_id}}">{{g.first_name}} {{g.last_name}}</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Rating (1-5) *</label>
+            <select ng-model="formData.rating" required>
+              <option ng-repeat="r in ratings" value="{{r}}">{{r}} Star{{r > 1 ? 's' : ''}}</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Comments</label>
+            <textarea ng-model="formData.comments" placeholder="Share your experience..."></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-outline" ng-click="closeModal()">Cancel</button>
+          <button class="btn btn-primary" ng-click="save()">Submit Feedback</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

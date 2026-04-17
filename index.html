@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="hotelApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Management System</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body ng-controller="AppCtrl">
+
+  <div class="app-wrapper" ng-if="isAuthenticated">
+
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🏨</div>
+      <div>
+        <h1>HotelPro</h1>
+        <span>Management Suite</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div ng-repeat="section in sections">
+        <div class="nav-section-label">{{section}}</div>
+        <div ng-repeat="item in navItems" ng-if="item.section === section">
+          <div class="nav-item"
+               ng-class="{active: isActive(item.path)}"
+               ng-click="navigate(item.path)">
+            <span class="nav-icon">{{item.icon}}</span>
+            <span>{{item.label}}</span>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div style="font-size:11px;color:var(--text-muted);">HotelPro v1.0</div>
+      <div style="font-size:11px;margin-top:2px;">Admin Panel</div>
+    </div>
+  </aside>
+
+
+  <div class="main-content">
+
+
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>{{getPageTitle()}}</h2>
+        <p>{{getPageSubtitle()}}</p>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-badge">🗓️ {{today}}</div>
+        <div class="topbar-badge">👤 {{currentUser || 'Admin'}}</div>
+        <button class="btn btn-outline btn-sm" ng-click="logout()">Logout</button>
+      </div>
+    </header>
+
+
+    <div class="page-body">
+      <div ng-view></div>
+    </div>
+
+  </div>
+</div>
+
+  <div class="auth-page" ng-if="!isAuthenticated">
+    <div ng-view></div>
+  </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-route.min.js"></script>
+
+
+<script src="app.js"></script>
+<script src="controllers/controllers.js"></script>
+
+</body>
+</html>

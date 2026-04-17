@@ -1,0 +1,148 @@
+<!-- frontend/views/dashboard.html -->
+<div>
+  <!-- Alert -->
+  <div class="alert alert-error" ng-if="error">⚠️ {{error}}</div>
+  <div class="loading" ng-if="loading">Loading dashboard...</div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid" ng-if="!loading">
+    <div class="stat-card">
+      <div class="stat-icon gold">🏨</div>
+      <div class="stat-info">
+        <h3>{{stats.total_hotels}}</h3>
+        <p>Total Hotels</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon teal">🛏️</div>
+      <div class="stat-info">
+        <h3>{{stats.available_rooms}} / {{stats.total_rooms}}</h3>
+        <p>Rooms Available</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">👤</div>
+      <div class="stat-info">
+        <h3>{{stats.total_guests}}</h3>
+        <p>Total Guests</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue">📅</div>
+      <div class="stat-info">
+        <h3>{{stats.active_reservations}}</h3>
+        <p>Active Reservations</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon gold">💰</div>
+      <div class="stat-info">
+        <h3>{{formatCurrency(stats.total_revenue)}}</h3>
+        <p>Total Revenue</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange">👥</div>
+      <div class="stat-info">
+        <h3>{{stats.total_staff}}</h3>
+        <p>Staff Members</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon red">🔧</div>
+      <div class="stat-info">
+        <h3>{{stats.open_maintenance}}</h3>
+        <p>Open Maintenance</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon teal">⭐</div>
+      <div class="stat-info">
+        <h3>{{stats.avg_rating}} / 5</h3>
+        <p>Avg Guest Rating</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lower Dashboard -->
+  <div class="dashboard-lower" ng-if="!loading">
+    <!-- Recent Reservations -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Recent Reservations</h3>
+        <a href="#!/reservations" class="btn btn-outline btn-sm">View All</a>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Guest</th>
+              <th>Room</th>
+              <th>Check-In</th>
+              <th>Check-Out</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="r in recentReservations">
+              <td>#{{r.reservation_id}}</td>
+              <td>{{r.guest_name}}</td>
+              <td>{{r.room_number}}</td>
+              <td>{{r.check_in_date | date:'dd MMM'}}</td>
+              <td>{{r.check_out_date | date:'dd MMM'}}</td>
+              <td>₹{{r.total_amount | number}}</td>
+              <td><span ng-class="getStatusBadge(r.status)">{{r.status}}</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="empty-state" ng-if="recentReservations.length === 0">
+          <div class="empty-icon">📅</div>
+          <p>No reservations yet</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Info -->
+    <div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header"><h3>Room Status</h3></div>
+        <div class="card-body" style="padding:20px;">
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="color:var(--text-secondary);">🟢 Available</span>
+              <strong style="color:#22c55e;">{{stats.available_rooms}}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="color:var(--text-secondary);">🟠 Occupied</span>
+              <strong style="color:#f97316;">{{stats.occupied_rooms}}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="color:var(--text-secondary);">🔴 Maintenance</span>
+              <strong style="color:#ef4444;">{{stats.total_rooms - stats.available_rooms - stats.occupied_rooms}}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3>Quick Actions</h3></div>
+        <div class="card-body" style="padding:16px;display:flex;flex-direction:column;gap:8px;">
+          <a href="#!/reservations" class="btn btn-primary" style="justify-content:center;">+ New Reservation</a>
+          <a href="#!/guests" class="btn btn-outline" style="justify-content:center;">+ Add Guest</a>
+          <a href="#!/rooms" class="btn btn-outline" style="justify-content:center;">+ Add Room</a>
+          <a href="#!/maintenance" class="btn btn-outline" style="justify-content:center;">🔧 Log Maintenance</a>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;" ng-if="stats.low_stock > 0">
+        <div class="card-header"><h3>⚠️ Low Stock Alert</h3></div>
+        <div class="card-body" style="padding:16px;">
+          <p style="color:var(--accent-orange);font-size:13px;">{{stats.low_stock}} inventory items are at or below reorder level.</p>
+          <a href="#!/inventory" class="btn btn-outline btn-sm" style="margin-top:10px;">View Inventory</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

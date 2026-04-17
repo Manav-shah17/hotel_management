@@ -1,0 +1,110 @@
+<!-- frontend/views/inventory.html -->
+<div>
+  <div class="alert alert-success" ng-if="alertMsg && alertType === 'success'">✅ {{alertMsg}}</div>
+  <div class="alert alert-error" ng-if="alertMsg && alertType === 'error'">❌ {{alertMsg}}</div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>Inventory Items ({{filteredItems().length}})</h3>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="search-bar">
+          <span>🔍</span>
+          <input type="text" ng-model="searchText" placeholder="Search inventory...">
+        </div>
+        <button class="btn btn-primary" ng-click="openAdd()">+ Add Item</button>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Item Name</th>
+            <th>Hotel</th>
+            <th>Category</th>
+            <th>In Stock</th>
+            <th>Reorder Level</th>
+            <th>Unit Cost</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="item in filteredItems()">
+            <td>#{{item.item_id}}</td>
+            <td><strong style="color:var(--text-primary)">{{item.name}}</strong></td>
+            <td>{{item.hotel_name}}</td>
+            <td><span class="badge badge-teal">{{item.category}}</span></td>
+            <td>
+              <strong ng-style="{'color': isLowStock(item) ? '#ef4444' : '#22c55e'}">
+                {{item.quantity_in_stock}}
+              </strong>
+            </td>
+            <td>{{item.reorder_level}}</td>
+            <td>₹{{item.unit_cost | number:2}}</td>
+            <td>
+              <span class="badge" ng-class="isLowStock(item) ? 'badge-red' : 'badge-green'">
+                {{isLowStock(item) ? '⚠️ Low Stock' : '✅ OK'}}
+              </span>
+            </td>
+            <td>
+              <div style="display:flex;gap:6px;">
+                <button class="btn btn-outline btn-sm" ng-click="openEdit(item)">✏️ Edit</button>
+                <button class="btn btn-danger btn-sm" ng-click="delete(item.item_id)">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="empty-state" ng-if="filteredItems().length === 0">
+        <div class="empty-icon">📦</div>
+        <p>No inventory items found</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" ng-class="{hidden: !showModal}">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>{{editMode ? 'Edit Item' : 'Add Inventory Item'}}</h3>
+        <button class="modal-close" ng-click="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Item Name *</label>
+            <input type="text" ng-model="formData.name" placeholder="e.g. Bath Towels" required>
+          </div>
+          <div class="form-group">
+            <label>Hotel *</label>
+            <select ng-model="formData.hotel_id" required>
+              <option value="">-- Select Hotel --</option>
+              <option ng-repeat="h in hotels" value="{{h.hotel_id}}">{{h.name}}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <input type="text" ng-model="formData.category" placeholder="e.g. Linen, Toiletries">
+          </div>
+          <div class="form-group">
+            <label>Quantity in Stock</label>
+            <input type="number" ng-model="formData.quantity_in_stock" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label>Reorder Level</label>
+            <input type="number" ng-model="formData.reorder_level" placeholder="10">
+          </div>
+          <div class="form-group">
+            <label>Unit Cost (₹)</label>
+            <input type="number" ng-model="formData.unit_cost" placeholder="0.00">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-outline" ng-click="closeModal()">Cancel</button>
+          <button class="btn btn-primary" ng-click="save()">{{editMode ? 'Update Item' : 'Add Item'}}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

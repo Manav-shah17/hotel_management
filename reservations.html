@@ -1,0 +1,116 @@
+<!-- frontend/views/reservations.html -->
+<div>
+  <div class="alert alert-success" ng-if="alertMsg && alertType === 'success'">✅ {{alertMsg}}</div>
+  <div class="alert alert-error" ng-if="alertMsg && alertType === 'error'">❌ {{alertMsg}}</div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>All Reservations ({{filteredReservations().length}})</h3>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="search-bar">
+          <span>🔍</span>
+          <input type="text" ng-model="searchText" placeholder="Search reservations...">
+        </div>
+        <button class="btn btn-primary" ng-click="openAdd()">+ New Reservation</button>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Guest</th>
+            <th>Hotel</th>
+            <th>Room</th>
+            <th>Check-In</th>
+            <th>Check-Out</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="r in filteredReservations()">
+            <td>#{{r.reservation_id}}</td>
+            <td>
+              <strong style="color:var(--text-primary)">{{r.guest_name}}</strong>
+              <div style="font-size:11px;color:var(--text-muted)">{{r.guest_email}}</div>
+            </td>
+            <td>{{r.hotel_name}}</td>
+            <td>
+              {{r.room_number}}
+              <div style="font-size:11px;color:var(--text-muted)">{{r.room_type}}</div>
+            </td>
+            <td>{{r.check_in_date | date:'dd MMM yyyy'}}</td>
+            <td>{{r.check_out_date | date:'dd MMM yyyy'}}</td>
+            <td><strong style="color:var(--accent-gold)">{{formatCurrency(r.total_amount)}}</strong></td>
+            <td><span ng-class="getStatusBadge(r.status)">{{r.status}}</span></td>
+            <td>
+              <div style="display:flex;gap:6px;">
+                <button class="btn btn-outline btn-sm" ng-click="openEdit(r)">✏️</button>
+                <button class="btn btn-danger btn-sm" ng-click="delete(r.reservation_id)">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="empty-state" ng-if="filteredReservations().length === 0">
+        <div class="empty-icon">📅</div>
+        <p>No reservations found</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" ng-class="{hidden: !showModal}">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>{{editMode ? 'Edit Reservation' : 'New Reservation'}}</h3>
+        <button class="modal-close" ng-click="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <!-- Auto-total notice -->
+        <div class="alert alert-success" ng-if="calculatedTotal">
+          💰 Estimated Total: <strong>₹{{calculatedTotal | number}}</strong>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Guest *</label>
+            <select ng-model="formData.guest_id" required>
+              <option value="">-- Select Guest --</option>
+              <option ng-repeat="g in guests" value="{{g.guest_id}}">{{g.first_name}} {{g.last_name}}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Room *</label>
+            <select ng-model="formData.room_id" ng-change="calculateTotal()" required>
+              <option value="">-- Select Room --</option>
+              <option ng-repeat="r in rooms" value="{{r.room_id}}">
+                {{r.room_number}} - {{r.room_type}} (₹{{r.price_per_night}}/night) - {{r.hotel_name}}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Check-In Date *</label>
+            <input type="date" ng-model="formData.check_in_date" ng-change="calculateTotal()" required>
+          </div>
+          <div class="form-group">
+            <label>Check-Out Date *</label>
+            <input type="date" ng-model="formData.check_out_date" ng-change="calculateTotal()" required>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select ng-model="formData.status">
+              <option ng-repeat="s in statusOptions" value="{{s}}">{{s}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-outline" ng-click="closeModal()">Cancel</button>
+          <button class="btn btn-primary" ng-click="save()">{{editMode ? 'Update' : 'Create Reservation'}}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
